@@ -123,7 +123,11 @@ static void php_ilimit_call_cancel(php_ilimit_call_t *call) { /* {{{ */
 
     call->state |= PHP_ILIMIT_INTERRUPT;
 
+    #if PHP_VERSION_ID >= 80300
+    zend_atomic_bool_store_ex(&EG(vm_interrupt), true);
+    #else
     EG(vm_interrupt) = 1;
+    #endif
 
     while (!(call->state & PHP_ILIMIT_INTERRUPTED)) {
         struct timespec clock;
